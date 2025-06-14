@@ -18,5 +18,5 @@ int	main(int argc, char **argv, char **envp)
 	validate_argument_count(argc);
 	fill_pipex(&pipex, argc, argv, envp);
 	execute_launch(&pipex);
-	return (0);
+	return (1);
 }
