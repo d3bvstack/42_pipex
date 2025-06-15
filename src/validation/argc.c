@@ -14,6 +14,6 @@
 
 void	validate_argument_count(int argc)
 {
-	if (argc < 5)
+	if (argc != 5)
 		syntax_error();
 }
