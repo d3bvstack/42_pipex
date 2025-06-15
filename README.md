@@ -1,1 +1,1 @@
-![Pipex UML](.extra/__PIPEX Program Flow Diagram__.svg)
+![Pipex UML](.extra/__PIPEX_Program_Flow_Diagram__.svg)
