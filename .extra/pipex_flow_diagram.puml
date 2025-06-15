@@ -1,5 +1,5 @@
 @startuml
-!theme none
+!theme plain
 skinparam backgroundColor #FFFFFF
 skinparam monochrome false
 skinparam shadowing false
