@@ -1,0 +1,206 @@
+@startuml
+!theme none
+skinparam backgroundColor #FFFFFF
+skinparam monochrome false
+skinparam shadowing false
+
+' Define colors for different types of nodes
+skinparam activity {
+    BackgroundColor<<start>> #90EE90
+    BorderColor<<start>> #2E8B57
+    BackgroundColor<<end>> #FFB6C1
+    BorderColor<<end>> #DC143C
+    BackgroundColor<<process>> #ADD8E6
+    BorderColor<<process>> #4682B4
+    BackgroundColor<<decision>> #FFE4B5
+    BorderColor<<decision>> #DEB887
+    BackgroundColor<<error>> #FFB6C1
+    BorderColor<<error>> #DC143C
+    BackgroundColor<<execution>> #DDA0DD
+    BorderColor<<execution>> #9370DB
+}
+
+title **PIPEX Program Flow Diagram**\n**Simulates: < infile cmd1 | cmd2 > outfile**
+
+start
+:main(argc, argv, envp) <<start>>;
+
+if (argc == 5?) then (no)
+    :Print "Incorrect syntax"
+    Print "Use: ./pipex infile \"cmd1\" \"cmd2\" outfile" <<error>>;
+    end
+else (yes)
+    :Initialize pipex structure
+    fill_pipex(&pipex, argc, argv, envp) <<process>>;
+endif
+
+:Set environment variables:
+- pipex->envp = envp
+- pipex->argv = argv <<process>>;
+
+:Extract PATH from environment
+retrieve_path_array(envp) <<process>>;
+
+:Create pipe
+pipe(pipex->pipefd) <<process>>;
+
+if (pipe creation successful?) then (no)
+    :error_generalist("pipe", NULL, pipex) <<error>>;
+    end
+else (yes)
+    :Setup file descriptors;\ninfile = argv[1];\noutfile = argv[4];\nInitialize FDs to -1 <<process>>;
+endif
+
+:Parse both commands (argv[2], argv[3]):
+For each command:
+- retrieve_command()
+- retrieve_arguments()
+- retrieve_pathname() <<process>>;
+
+partition "Command Path Resolution" {
+    if (command contains '/'?) then (yes)
+        :Set as direct path:
+        cmd->is_pathname = 1
+        pathname = command <<process>>;
+    else (no)
+        :Search in PATH directories <<process>>;
+        if (found in PATH?) then (yes)
+            :Set full pathname:
+            pathname = path/command <<process>>;
+        else (no)
+            :Command not found:
+            pathname = NULL <<process>>;
+        endif
+    endif
+}
+
+:Execute pipeline:
+execute_launch(pipex) <<execution>>;
+
+fork
+    :Fork first child process
+    pid[0] = fork() <<process>>;
+    
+    if (fork successful?) then (no)
+        :error_generalist("fork", NULL, pipex) <<error>>;
+        end
+    else (yes)
+        if (child process?) then (yes)
+            partition "Child Process 1: Input → Pipe" {
+                :Open input file:
+                open(infile, O_RDONLY) <<process>>;
+                
+                if (file opened successfully?) then (no)
+                    :error_generalist(infile, NULL, pipex) <<error>>;
+                    end
+                else (yes)
+                    :Redirect I/O:
+                    dup2(infile_fd, STDIN_FILENO)
+                    dup2(pipefd[1], STDOUT_FILENO) <<process>>;
+                    
+                    :Close file descriptors:
+                    close(infile_fd)
+                    close(pipefd[0])
+                    close(pipefd[1]) <<process>>;
+                    
+                    :Execute first command:
+                    execute_cmd(&cmds[0], pipex) <<execution>>;
+                    
+                    if (execve successful?) then (yes)
+                        :Command 1 runs and exits <<execution>>;
+                        end
+                    else (no)
+                        if (errno == ENOENT?) then (yes)
+                            :error_cmd_not_found(cmd)
+                            exit(127) <<error>>;
+                            end
+                        else (no)
+                            :error_generalist(cmd->command, NULL, pipex) <<error>>;
+                            end
+                        endif
+                    endif
+                endif
+            }
+        else (no - parent)
+            :Continue to second fork <<process>>;
+        endif
+    endif
+fork again
+    :Fork second child process
+    pid[1] = fork() <<process>>;
+    
+    if (fork successful?) then (no)
+        :error_generalist("fork", NULL, pipex) <<error>>;
+        end
+    else (yes)
+        if (child process?) then (yes)
+            partition "Child Process 2: Pipe → Output" {
+                :Open output file:
+                open(outfile, O_WRONLY|O_CREAT|O_TRUNC, 0644) <<process>>;
+                
+                if (file opened successfully?) then (no)
+                    :error_generalist(outfile, NULL, pipex) <<error>>;
+                    end
+                else (yes)
+                    :Redirect I/O:
+                    dup2(pipefd[0], STDIN_FILENO)
+                    dup2(outfile_fd, STDOUT_FILENO) <<process>>;
+                    
+                    :Close file descriptors:
+                    close(outfile_fd)
+                    close(pipefd[0])
+                    close(pipefd[1]) <<process>>;
+                    
+                    :Execute second command:
+                    execute_cmd(&cmds[1], pipex) <<execution>>;
+                    
+                    if (execve successful?) then (yes)
+                        :Command 2 runs and exits <<execution>>;
+                        end
+                    else (no)
+                        if (errno == ENOENT?) then (yes)
+                            :error_cmd_not_found(cmd)
+                            exit(127) <<error>>;
+                            end
+                        else (no)
+                            :error_generalist(cmd->command, NULL, pipex) <<error>>;
+                            end
+                        endif
+                    endif
+                endif
+            }
+        else (no - parent)
+            partition "Parent Process" {
+                :Close pipe file descriptors:
+                close(pipefd[0])
+                close(pipefd[1]) <<process>>;
+                
+                :Wait for both children:
+                waitpid(pid[0], NULL, 0)
+                waitpid(pid[1], &exit_status, 0) <<process>>;
+                
+                :Cleanup resources:
+                free_pipex_members(pipex) <<process>>;
+                
+                :Free command structures:
+                free_cmd_members(&cmds[0])
+                free_cmd_members(&cmds[1]) <<process>>;
+                
+                :Free PATH array:
+                ft_free_array(path_array) <<process>>;
+                
+                :Close any remaining file descriptors <<process>>;
+                
+                if (WIFEXITED(exit_status)?) then (yes)
+                    :exit(WEXITSTATUS(exit_status)) <<end>>;
+                else (no)
+                    :exit(EXIT_SUCCESS) <<end>>;
+                endif
+            }
+        endif
+    endif
+end fork
+
+end
+
+@enduml
