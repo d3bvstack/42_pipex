@@ -45,7 +45,7 @@ retrieve_path_array(envp) <<process>>;
 pipe(pipex->pipefd) <<process>>;
 
 if (pipe creation successful?) then (no)
-    :error_generalist("pipe", NULL, pipex) <<error>>;
+    :error_generalist("pipe", pipex) <<error>>;
     end
 else (yes)
     :Setup file descriptors;\ninfile = argv[1];\noutfile = argv[4];\nInitialize FDs to -1 <<process>>;
@@ -82,7 +82,7 @@ fork
     pid[0] = fork() <<process>>;
     
     if (fork successful?) then (no)
-        :error_generalist("fork", NULL, pipex) <<error>>;
+        :error_generalist("fork", pipex) <<error>>;
         end
     else (yes)
         if (child process?) then (yes)
@@ -91,7 +91,7 @@ fork
                 open(infile, O_RDONLY) <<process>>;
                 
                 if (file opened successfully?) then (no)
-                    :error_generalist(infile, NULL, pipex) <<error>>;
+                    :error_generalist(infile, pipex) <<error>>;
                     end
                 else (yes)
                     :Redirect I/O:
@@ -115,7 +115,7 @@ fork
                             exit(127) <<error>>;
                             end
                         else (no)
-                            :error_generalist(cmd->command, NULL, pipex) <<error>>;
+                            :error_generalist(cmd->command, pipex) <<error>>;
                             end
                         endif
                     endif
@@ -130,7 +130,7 @@ fork again
     pid[1] = fork() <<process>>;
     
     if (fork successful?) then (no)
-        :error_generalist("fork", NULL, pipex) <<error>>;
+        :error_generalist("fork", pipex) <<error>>;
         end
     else (yes)
         if (child process?) then (yes)
@@ -139,7 +139,7 @@ fork again
                 open(outfile, O_WRONLY|O_CREAT|O_TRUNC, 0644) <<process>>;
                 
                 if (file opened successfully?) then (no)
-                    :error_generalist(outfile, NULL, pipex) <<error>>;
+                    :error_generalist(outfile, pipex) <<error>>;
                     end
                 else (yes)
                     :Redirect I/O:
@@ -163,7 +163,7 @@ fork again
                             exit(127) <<error>>;
                             end
                         else (no)
-                            :error_generalist(cmd->command, NULL, pipex) <<error>>;
+                            :error_generalist(cmd->command, pipex) <<error>>;
                             end
                         endif
                     endif

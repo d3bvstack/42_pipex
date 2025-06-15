@@ -18,7 +18,7 @@ void	fill_pipex(t_pipex *pipex, int argc, char **argv, char **envp)
 	pipex->argv = argv;
 	pipex->path_array = retrieve_path_array(envp);
 	if (pipe(pipex->pipefd) == -1)
-		error_generalist("pipe", NULL, pipex);
+		error_generalist("pipe", pipex);
 	pipex->infile = argv[1];
 	pipex->infile_fd = -1;
 	pipex->outfile = argv[argc - 1];

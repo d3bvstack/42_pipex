@@ -22,13 +22,13 @@ void	execute_cmd(t_cmd *cmd, t_pipex *pipex)
 	if (pipex->path_array == NULL || cmd->is_pathname == 1)
 	{
 		if (execve(pathname, cmd->arguments, pipex->envp) == -1)
-			error_generalist(cmd->command, NULL, pipex);
+			error_generalist(cmd->command, pipex);
 	}
 	if (execve(pathname, cmd->arguments, pipex->envp) == -1)
 	{
 		if (errno == ENOENT)
 			error_cmd_not_found(cmd);
 		else
-			error_generalist(cmd->command, NULL, pipex);
+			error_generalist(cmd->command, pipex);
 	}
 }

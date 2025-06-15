@@ -44,7 +44,7 @@ void	free_cmd_members(t_cmd *cmd);
 // Errors
 void	syntax_error(void);
 void	malloc_error(t_pipex *pipex);
-void	error_generalist(char *origin, t_cmd *cmd, t_pipex *pipex);
+void	error_generalist(char *origin, t_pipex *pipex);
 void	error_cmd_not_found(t_cmd *cmd);
 
 #endif

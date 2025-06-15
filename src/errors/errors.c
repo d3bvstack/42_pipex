@@ -28,7 +28,7 @@ void	malloc_error(t_pipex *pipex)
 	exit(EXIT_FAILURE);
 }
 
-void	error_generalist(char *origin, t_cmd *cmd, t_pipex *pipex)
+void	error_generalist(char *origin, t_pipex *pipex)
 {
 	const char	*error_str = strerror(errno);
 
@@ -37,19 +37,6 @@ void	error_generalist(char *origin, t_cmd *cmd, t_pipex *pipex)
 	{
 		ft_putstr_fd(origin, STDERR_FILENO);
 		ft_putstr_fd(": ", STDERR_FILENO);
-	}
-	if (cmd)
-	{
-		if (cmd->is_pathname && cmd->pathname)
-		{
-			ft_putstr_fd(cmd->pathname, STDERR_FILENO);
-			ft_putstr_fd(": ", STDERR_FILENO);
-		}
-		else if (cmd->command)
-		{
-			ft_putstr_fd(cmd->command, STDERR_FILENO);
-			ft_putstr_fd(": ", STDERR_FILENO);
-		}
 	}
 	ft_putendl_fd((char *)error_str, STDERR_FILENO);
 	free_pipex_members(pipex);
