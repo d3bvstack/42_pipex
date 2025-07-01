@@ -6,7 +6,7 @@
 /*   By: dbarba-v <dbarba-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 11:50:50 by dbarba-v          #+#    #+#             */
-/*   Updated: 2025/06/14 17:17:32 by dbarba-v         ###   ########.fr       */
+/*   Updated: 2025/06/16 11:55:01 by dbarba-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,43 +37,18 @@ char	*retrieve_pathname(t_pipex *pipex, t_cmd *cmd)
 	return (NULL);
 }
 
-static char	*get_arguments(t_pipex *pipex, int i)
-{
-	char	**array;
-	char 	*tmp;
-	char	*arguments_string;
-	int		j;
-
-	array = ft_split(pipex->argv[i], ' ');
-	if (!array)
-		malloc_error(pipex);
-	arguments_string = NULL;
-	if (array[1])
-	{
-		arguments_string = ft_strdup(array[1]);
-		j = 2;
-		while (array[j])
-		{
-			tmp = arguments_string;
-			arguments_string = ft_strjoin_three(arguments_string, " ", array[j]);
-			free(tmp);
-			j++;
-		}
-	}
-	ft_free_array((void **)array);
-	return (arguments_string);
-}
-
 char	**retrieve_arguments(t_pipex *pipex, int i)
 {
 	char	**arguments_array;
 
-	arguments_array = ft_calloc(3, sizeof(char *));
-	if (!arguments_array)
-		malloc_error(pipex);
-	arguments_array[0] = retrieve_command(pipex, i);
-	arguments_array[1] = get_arguments(pipex, i);
-	arguments_array[2] = 0;
+	if (pipex->argv[i][0])
+	{
+		arguments_array = ft_split(pipex->argv[i], ' ');
+		if (!arguments_array)
+			malloc_error(pipex);
+	}
+	else
+		arguments_array = ft_calloc(2, sizeof(char **));
 	return (arguments_array);
 }
 
@@ -98,7 +73,9 @@ char	*retrieve_command(t_pipex *pipex, int i)
 
 char	**retrieve_path_array(char **envp)
 {
-	int i = 0;
+	int	i;
+
+	i = 0;
 	while (envp[i])
 	{
 		if (!ft_strncmp(envp[i], "PATH=", 5))

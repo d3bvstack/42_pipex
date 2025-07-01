@@ -6,7 +6,7 @@
 /*   By: dbarba-v <dbarba-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 19:45:53 by dbarba-v          #+#    #+#             */
-/*   Updated: 2025/06/14 17:28:52 by dbarba-v         ###   ########.fr       */
+/*   Updated: 2025/06/16 11:34:06 by dbarba-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	execute_cmd(t_cmd *cmd, t_pipex *pipex)
 	if (execve(pathname, cmd->arguments, pipex->envp) == -1)
 	{
 		if (errno == ENOENT)
-			error_cmd_not_found(cmd);
+			error_cmd_not_found(cmd, pipex);
 		else
 			error_generalist(cmd->command, pipex);
 	}

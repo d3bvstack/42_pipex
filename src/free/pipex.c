@@ -6,7 +6,7 @@
 /*   By: dbarba-v <dbarba-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 10:41:12 by dbarba-v          #+#    #+#             */
-/*   Updated: 2025/06/14 17:17:05 by dbarba-v         ###   ########.fr       */
+/*   Updated: 2025/06/16 10:46:48 by dbarba-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ void	free_pipex_members(t_pipex *pipex)
 	{
 		if (pipex->path_array)
 			ft_free_array((void **)(pipex->path_array));
-		if(pipex->infile_fd != -1)
+		if (pipex->infile_fd != -1)
 			close(pipex->infile_fd);
-		if(pipex->outfile_fd != -1)
+		if (pipex->outfile_fd != -1)
 			close(pipex->outfile_fd);
-		if(pipex->pipefd[0] != -1)
+		if (pipex->pipefd[0] != -1)
 			close(pipex->pipefd[0]);
-		if(pipex->pipefd[1] != -1)
+		if (pipex->pipefd[1] != -1)
 			close(pipex->pipefd[1]);
 		free_cmd_members(&(pipex->cmds[0]));
 		free_cmd_members(&(pipex->cmds[1]));

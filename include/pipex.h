@@ -6,7 +6,7 @@
 /*   By: dbarba-v <dbarba-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 13:18:02 by dbarba-v          #+#    #+#             */
-/*   Updated: 2025/06/14 17:18:15 by dbarba-v         ###   ########.fr       */
+/*   Updated: 2025/06/16 11:34:53 by dbarba-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,6 @@ void	free_cmd_members(t_cmd *cmd);
 void	syntax_error(void);
 void	malloc_error(t_pipex *pipex);
 void	error_generalist(char *origin, t_pipex *pipex);
-void	error_cmd_not_found(t_cmd *cmd);
+void	error_cmd_not_found(t_cmd *cmd, t_pipex *pipex);
 
 #endif

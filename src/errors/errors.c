@@ -6,18 +6,18 @@
 /*   By: dbarba-v <dbarba-v@student.42madrid.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/13 09:59:31 by dbarba-v          #+#    #+#             */
-/*   Updated: 2025/06/14 17:29:00 by dbarba-v         ###   ########.fr       */
+/*   Updated: 2025/06/16 11:34:37 by dbarba-v         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../include/pipex.h"
 
-void	error_cmd_not_found(t_cmd *cmd)
+void	error_cmd_not_found(t_cmd *cmd, t_pipex *pipex)
 {
 	ft_putstr_fd("pipex: ", STDERR_FILENO);
 	ft_putstr_fd(cmd->command, STDERR_FILENO);
 	ft_putendl_fd(": command not found", STDERR_FILENO);
-	free_cmd_members(cmd);
+	free_pipex_members(pipex);
 	exit(127);
 }
 
